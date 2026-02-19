@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C VIVINE JOHN | Founder Mode</title>
+
+<style>
+
+/* ===== GLOBAL ===== */
+:root{
+    --accent:#ff00ff;
+    --accent2:#00ffff;
+}
+
+body{
+    margin:0;
+    font-family:Consolas, monospace;
+    color:white;
+    background:black;
+    overflow-x:hidden;
+}
+
+/* ===== STARFIELD ===== */
+.star{
+    position:fixed;
+    width:2px;
+    height:2px;
+    background:white;
+    opacity:0.7;
+    animation:float 10s linear infinite;
+}
+
+@keyframes float{
+    from{transform:translateY(100vh);}
+    to{transform:translateY(-10vh);}
+}
+
+/* ===== HERO ===== */
+header{
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+}
+
+header h1{
+    font-size:70px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;
+    color:transparent;
+    text-shadow:0 0 30px var(--accent);
+}
+
+.subtitle{
+    font-size:22px;
+    margin-top:20px;
+    animation:pulse 2s infinite alternate;
+}
+
+@keyframes pulse{
+    from{opacity:0.5;}
+    to{opacity:1;}
+}
+
+/* ===== SECTIONS ===== */
+section{
+    padding:120px 20px;
+    max-width:1100px;
+    margin:auto;
+    border-bottom:1px solid #222;
+}
+
+/* ===== XP SYSTEM ===== */
+.level-box{
+    font-size:24px;
+    margin-bottom:30px;
+}
+
+.xp-bar{
+    height:20px;
+    background:#111;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.xp-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    transition:3s;
+}
+
+/* ===== SKILL TREE ===== */
+.skill-node{
+    display:inline-block;
+    margin:15px;
+    padding:15px 25px;
+    border-radius:30px;
+    border:2px solid var(--accent);
+    transition:0.4s;
+    cursor:pointer;
+}
+
+.skill-node:hover{
+    background:var(--accent);
+    box-shadow:0 0 20px var(--accent);
+}
+
+/* ===== PROJECTS ===== */
+.project{
+    margin-top:40px;
+    padding:30px;
+    background:#111;
+    border-radius:20px;
+    transition:0.5s;
+}
+
+.project:hover{
+    transform:scale(1.03);
+    box-shadow:0 0 25px var(--accent);
+}
+
+/* ===== ACHIEVEMENTS ===== */
+.badge{
+    display:inline-block;
+    margin:10px;
+    padding:12px 20px;
+    border-radius:30px;
+    background:var(--accent);
+    animation:glow 2s infinite alternate;
+}
+
+@keyframes glow{
+    from{box-shadow:0 0 10px var(--accent);}
+    to{box-shadow:0 0 40px var(--accent2);}
+}
+
+/* ===== TERMINAL ===== */
+#terminal{
+    background:#000;
+    padding:20px;
+    border-radius:10px;
+    height:300px;
+    overflow-y:auto;
+    font-size:14px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    background:black;
+    color:white;
+    border:1px solid var(--accent);
+}
+
+/* ===== FOOTER ===== */
+footer{
+    text-align:center;
+    padding:40px;
+    opacity:0.5;
+}
+
+</style>
+</head>
+<body>
+
+<!-- STARFIELD -->
+<script>
+for(let i=0;i<200;i++){
+    let star=document.createElement("div");
+    star.className="star";
+    star.style.left=Math.random()*100+"vw";
+    star.style.animationDuration=(Math.random()*10+5)+"s";
+    document.body.appendChild(star);
+}
+</script>
+
+<header>
+    <h1>C VIVINE JOHN</h1>
+    <div class="subtitle">🚀 Founder | Developer | Universe Builder</div>
+</header>
+
+<section>
+    <h2>🧬 LEVEL STATUS</h2>
+    <div class="level-box">LEVEL 47 – Startup Founder</div>
+    <div class="xp-bar">
+        <div class="xp-fill" id="xp"></div>
+    </div>
+</section>
+
+<section>
+    <h2>🕹 SKILL TREE</h2>
+    <div class="skill-node">HTML Mastery</div>
+    <div class="skill-node">CSS Animation Architect</div>
+    <div class="skill-node">JavaScript Combat Logic</div>
+    <div class="skill-node">UI Gaming Design</div>
+    <div class="skill-node">Startup Strategy</div>
+    <div class="skill-node">Product Vision</div>
+</section>
+
+<section>
+    <h2>🚀 FOUNDER OF STARTUP</h2>
+    <div class="project">
+        <h3>Cosmic Labs</h3>
+        <p>
+        Founded Cosmic Labs – a digital innovation startup focused on
+        interactive web systems, gaming-style UI frameworks,
+        and immersive web applications.
+        </p>
+        <p>
+        Mission: Redefine how users experience the web.
+        </p>
+    </div>
+</section>
+
+<section>
+    <h2>🎮 MISSIONS COMPLETED</h2>
+
+    <div class="project">
+        <h3>Neon Stickman Battle Engine</h3>
+        <p>Built a physics-based animated fighting system using JavaScript.</p>
+    </div>
+
+    <div class="project">
+        <h3>Cosmic FLAMES Compatibility System</h3>
+        <p>Created interactive UI logic with animation-driven emotional simulation.</p>
+    </div>
+
+    <div class="project">
+        <h3>Galaxy UI Framework</h3>
+        <p>Designed reusable animated UI components for futuristic web apps.</p>
+    </div>
+
+    <div class="project">
+        <h3>Terminal AI Interface</h3>
+        <p>Built browser-based command AI simulation system.</p>
+    </div>
+
+</section>
+
+<section>
+    <h2>🏆 ACHIEVEMENTS</h2>
+    <div class="badge">Founder Status Unlocked</div>
+    <div class="badge">UI Combat Master</div>
+    <div class="badge">Animation Overlord</div>
+    <div class="badge">Startup Visionary</div>
+</section>
+
+<section>
+    <h2>🛰 COMMAND TERMINAL</h2>
+
+    <div id="terminal">
+        > Welcome to C VIVINE JOHN System<br>
+        > Type: skills | projects | founder | hire
+    </div>
+    <input type="text" id="command" placeholder="Enter command...">
+</section>
+
+<footer>
+    © 2026 C VIVINE JOHN | This Universe Is Mine 🌌
+</footer>
+
+<script>
+
+/* XP Animation */
+window.onload=function(){
+    setTimeout(()=>{
+        document.getElementById("xp").style.width="85%";
+    },500);
+};
+
+/* TERMINAL LOGIC */
+document.getElementById("command").addEventListener("keydown",function(e){
+    if(e.key==="Enter"){
+        let value=this.value.toLowerCase();
+        let terminal=document.getElementById("terminal");
+        terminal.innerHTML+="<br>> "+value;
+
+        if(value==="skills")
+            terminal.innerHTML+="<br>HTML, CSS, JS, UI Design, Startup Strategy";
+        else if(value==="projects")
+            terminal.innerHTML+="<br>Neon Battle, Cosmic FLAMES, Galaxy UI";
+        else if(value==="founder")
+            terminal.innerHTML+="<br>Founder of Cosmic Labs – Interactive Web Startup.";
+        else if(value==="hire")
+            terminal.innerHTML+="<br>You don't hire me. We collaborate.";
+        else
+            terminal.innerHTML+="<br>Unknown command.";
+
+        terminal.scrollTop=terminal.scrollHeight;
+        this.value="";
+    }
+});
+
+</script>
+
+</body>
+</html>
