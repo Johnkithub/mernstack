@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DOM Practice – Altered</title>
+
+<style>
+  body { font-family: Arial, sans-serif; }
+  .dark-mode { background:#222; color:white; }
+
+  .product-card{ padding:10px; margin:5px; border:1px solid #ddd; }
+  .menu li{ list-style:none; padding:5px; }
+  .highlight{ background:yellow; }
+
+  .card{ border:1px solid #ccc; padding:10px; margin:5px; }
+
+  .swatch{
+    width:40px; height:40px;
+    display:inline-block;
+    cursor:pointer;
+    margin-right:5px;
+  }
+
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .modal{
+    background:white;
+    padding:20px;
+    border-radius:6px;
+    width:300px;
+  }
+</style>
+</head>
+
+<body>
+
+<h1 id="header-title">Header</h1>
+
+<div class="product-card">Product 1</div>
+<div class="product-card">Product 2</div>
+
+<ul class="menu">
+  <li>Home</li>
+  <li>About</li>
+</ul>
+
+<div id="controls"></div>
+<div id="cart"></div>
+
+<img class="avatar" width="100">
+
+<div class="article-body">
+  <p>Paragraph 1</p>
+  <p>Paragraph 2</p>
+  <div><p>Nested (ignored)</p></div>
+</div>
+
+<button id="theme-toggle">Toggle Theme</button>
+
+<div class="card">
+  <button data-action="delete">Delete Card</button>
+</div>
+
+<hr>
+
+<!-- Todo -->
+<input id="todo-input">
+<button id="add-todo">Add</button>
+<ul id="todo-list"></ul>
+
+<hr>
+
+<!-- Delegation -->
+<ul id="users-list">
+  <li data-user-id="123">John</li>
+  <li data-user-id="456">Jane</li>
+</ul>
+
+<hr>
+
+<!-- Counter -->
+<button id="decrement">-1</button>
+<span id="count">0</span>
+<button id="increment">+1</button>
+
+<hr>
+
+<!-- Search -->
+<input id="search" placeholder="Search country">
+<ul>
+  <li class="country">India</li>
+  <li class="country">Canada</li>
+  <li class="country">France</li>
+</ul>
+
+<hr>
+
+<!-- Color Picker -->
+<div class="swatch" data-color="#e74c3c" style="background:#e74c3c"></div>
+<div class="swatch" data-color="#3498db" style="background:#3498db"></div>
+<div class="swatch" data-color="#2ecc71" style="background:#2ecc71"></div>
+
+<hr>
+
+<!-- Sortable -->
+<ul id="sortable">
+  <li draggable="true">Item 1</li>
+  <li draggable="true">Item 2</li>
+  <li draggable="true">Item 3</li>
+</ul>
+
+<hr>
+
+<button id="open-modal">Open Modal</button>
+
+<script>
+
+/* ===== EASY ===== */
+
+// 1
+document.querySelector("#header-title").textContent =
+  "My Awesome Page 🚀";
+
+// 2
+document.querySelectorAll(".product-card")
+  .forEach(card => card.style.border = "2px solid red");
+
+// 3
+document.querySelectorAll(".menu li")
+  .forEach(li => li.style.background = "lightblue");
+
+// 4
+document.querySelector("#controls")
+  .insertAdjacentHTML("beforeend",
+    `<button>Click Me!</button>`);
+
+
+/* ===== MEDIUM ===== */
+
+// 5
+document.querySelector("#cart")
+  .insertAdjacentHTML("beforeend",
+    `<div class="item">
+      <span>Apple</span>
+      <button>Remove</button>
+    </div>`);
+
+// 6
+document.querySelector(".avatar").src =
+  "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d";
+
+// 7
+document.querySelectorAll(".article-body > p")
+  .forEach(p => p.classList.add("highlight"));
+
+// 8
+document.querySelector("#theme-toggle")
+  .addEventListener("click",
+    () => document.body.classList.toggle("dark-mode")
+  );
+
+// 9 (delegation)
+document.addEventListener("click", e => {
+  if (e.target.dataset.action === "delete") {
+    e.target.closest(".card")?.remove();
+  }
+});
+
+
+/* ===== TODO ===== */
+
+document.querySelector("#add-todo")
+.addEventListener("click", () => {
+
+  const input = document.querySelector("#todo-input");
+  if (!input.value.trim()) return;
+
+  const li = document.createElement("li");
+  li.innerHTML = `${input.value} <button>Delete</button>`;
+
+  li.querySelector("button")
+    .addEventListener("click", () => li.remove());
+
+  document.querySelector("#todo-list").append(li);
+  input.value = "";
+});
+
+
+/* ===== HARD ===== */
+
+// 11
+document.querySelector("#users-list")
+.addEventListener("click", e => {
+  if (e.target.matches("li")) {
+    console.log("User ID:", e.target.dataset.userId);
+  }
+});
+
+// 12 Counter
+let count = 0;
+const countEl = document.querySelector("#count");
+
+document.querySelector("#increment").onclick =
+  () => countEl.textContent = ++count;
+
+document.querySelector("#decrement").onclick =
+  () => countEl.textContent = (count = Math.max(0, count-1));
+
+
+// 13 Search
+document.querySelector("#search")
+.addEventListener("input", e => {
+
+  const value = e.target.value.toLowerCase();
+
+  document.querySelectorAll(".country")
+    .forEach(li => {
+      li.style.display =
+        li.textContent.toLowerCase().includes(value)
+        ? ""
+        : "none";
+    });
+
+});
+
+
+// 14 Color Picker (delegation)
+document.addEventListener("click", e => {
+  if (e.target.classList.contains("swatch")) {
+    document.body.style.backgroundColor =
+      e.target.dataset.color;
+  }
+});
+
+
+// 15 Sortable
+let dragged;
+document.querySelectorAll("#sortable li").forEach(li => {
+
+  li.addEventListener("dragstart", () => dragged = li);
+  li.addEventListener("dragover", e => e.preventDefault());
+
+  li.addEventListener("drop", () => {
+    [li.textContent, dragged.textContent] =
+    [dragged.textContent, li.textContent];
+  });
+
+});
+
+
+// 16 Modal
+document.querySelector("#open-modal").onclick = () => {
+
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+
+  overlay.innerHTML = `
+    <div class="modal">
+      <h3>Modal Title</h3>
+      <p>This is a modal</p>
+      <button id="close-modal">Close</button>
+    </div>
+  `;
+
+  document.body.append(overlay);
+
+  overlay.onclick = e => {
+    if (e.target === overlay ||
+        e.target.id === "close-modal")
+      overlay.remove();
+  };
+};
+
+</script>
+
+</body>
+</html>
