@@ -1,0 +1,314 @@
+====================================================
+        MONGODB COMPLETE QUERY PRACTICE FILE
+        (Basic + Advanced + Aggregation)
+====================================================
+
+==============================
+1️⃣ DATABASE OPERATIONS
+==============================
+
+Show Databases
+--------------
+show dbs
+
+Create / Switch Database
+-------------------------
+use studentManagement
+
+Drop Database
+-------------
+db.dropDatabase()
+
+
+==============================
+2️⃣ COLLECTION OPERATIONS
+==============================
+
+Create Collection
+-----------------
+db.createCollection("students")
+db.createCollection("courses")
+
+Show Collections
+----------------
+show collections
+
+Drop Collection
+---------------
+db.students.drop()
+
+
+==============================
+3️⃣ INSERT OPERATIONS
+==============================
+
+Insert One
+----------
+db.students.insertOne({
+    name: "Arun",
+    age: 21,
+    department: "CSE",
+    marks: 85,
+    skills: ["Java", "MongoDB"],
+    address: { city: "Chennai", pincode: 600001 }
+})
+
+Insert Many
+-----------
+db.students.insertMany([
+{
+    name: "Divya",
+    age: 22,
+    department: "IT",
+    marks: 90,
+    skills: ["Python", "NodeJS"],
+    address: { city: "Bangalore", pincode: 560001 }
+},
+{
+    name: "Kiran",
+    age: 20,
+    department: "ECE",
+    marks: 75,
+    skills: ["Embedded C", "VLSI"],
+    address: { city: "Hyderabad", pincode: 500001 }
+},
+{
+    name: "Meena",
+    age: 23,
+    department: "CSE",
+    marks: 88,
+    skills: ["React", "Express"],
+    address: { city: "Chennai", pincode: 600020 }
+}
+])
+
+
+==============================
+4️⃣ FIND OPERATIONS
+==============================
+
+Find All
+--------
+db.students.find()
+
+Find with Condition
+-------------------
+db.students.find({ department: "CSE" })
+
+Find with Greater Than
+----------------------
+db.students.find({ marks: { $gt: 80 } })
+
+Find with Less Than
+-------------------
+db.students.find({ age: { $lt: 22 } })
+
+Find with AND
+-------------
+db.students.find({
+    $and: [
+        { marks: { $gt: 80 } },
+        { age: { $lt: 23 } }
+    ]
+})
+
+Find with OR
+------------
+db.students.find({
+    $or: [
+        { department: "CSE" },
+        { department: "IT" }
+    ]
+})
+
+Find using IN
+-------------
+db.students.find({ department: { $in: ["CSE", "IT"] } })
+
+Find using NOT EQUAL
+--------------------
+db.students.find({ department: { $ne: "ECE" } })
+
+
+==============================
+5️⃣ PROJECTION
+==============================
+
+Show only name and marks
+------------------------
+db.students.find(
+    {},
+    { name: 1, marks: 1, _id: 0 }
+)
+
+
+==============================
+6️⃣ ARRAY OPERATIONS
+==============================
+
+Find students who know Java
+---------------------------
+db.students.find({ skills: "Java" })
+
+Add skill
+---------
+db.students.updateOne(
+    { name: "Arun" },
+    { $push: { skills: "ExpressJS" } }
+)
+
+Remove skill
+------------
+db.students.updateOne(
+    { name: "Arun" },
+    { $pull: { skills: "MongoDB" } }
+)
+
+
+==============================
+7️⃣ EMBEDDED DOCUMENT QUERY
+==============================
+
+Find students from Chennai
+--------------------------
+db.students.find({ "address.city": "Chennai" })
+
+
+==============================
+8️⃣ UPDATE OPERATIONS
+==============================
+
+Update One
+----------
+db.students.updateOne(
+    { name: "Arun" },
+    { $set: { marks: 95 } }
+)
+
+Update Many
+-----------
+db.students.updateMany(
+    { department: "CSE" },
+    { $set: { department: "Computer Science" } }
+)
+
+Upsert
+------
+db.students.updateOne(
+    { name: "Ravi" },
+    { $set: { age: 24, department: "CSE" } },
+    { upsert: true }
+)
+
+Rename Field
+------------
+db.students.updateMany(
+    {},
+    { $rename: { "marks": "score" } }
+)
+
+Remove Field
+------------
+db.students.updateOne(
+    { name: "Divya" },
+    { $unset: { age: "" } }
+)
+
+
+==============================
+9️⃣ DELETE OPERATIONS
+==============================
+
+Delete One
+----------
+db.students.deleteOne({ name: "Kiran" })
+
+Delete Many
+-----------
+db.students.deleteMany({ score: { $lt: 80 } })
+
+
+==============================
+🔟 SORT, LIMIT, SKIP
+==============================
+
+Sort Descending
+---------------
+db.students.find().sort({ score: -1 })
+
+Sort Ascending
+--------------
+db.students.find().sort({ age: 1 })
+
+Limit
+-----
+db.students.find().limit(2)
+
+Skip
+----
+db.students.find().skip(1)
+
+
+==============================
+11️⃣ COUNT
+==============================
+
+db.students.countDocuments()
+
+
+==============================
+12️⃣ AGGREGATION FRAMEWORK
+==============================
+
+Average Score
+-------------
+db.students.aggregate([
+    { $group: { _id: null, averageScore: { $avg: "$score" } } }
+])
+
+Maximum Score
+-------------
+db.students.aggregate([
+    { $group: { _id: null, maxScore: { $max: "$score" } } }
+])
+
+Group by Department
+-------------------
+db.students.aggregate([
+    { $group: { _id: "$department", totalStudents: { $sum: 1 } } }
+])
+
+
+==============================
+13️⃣ INDEXING
+==============================
+
+Create Index
+------------
+db.students.createIndex({ score: 1 })
+
+View Indexes
+------------
+db.students.getIndexes()
+
+Drop Index
+----------
+db.students.dropIndex({ score: 1 })
+
+
+==============================
+14️⃣ TEXT SEARCH
+==============================
+
+Create Text Index
+-----------------
+db.students.createIndex({ name: "text" })
+
+Search Text
+-----------
+db.students.find({ $text: { $search: "Arun" } })
+
+
+====================================================
+END OF MONGODB COMPLETE PRACTICE QUERIES
+====================================================
