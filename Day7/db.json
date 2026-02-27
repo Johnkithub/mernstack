@@ -1,0 +1,28 @@
+{
+  "goals": [
+    {
+      "id": "ffd1",
+      "title": "erht",
+      "type": "project",
+      "completed": true
+    },
+    {
+      "id": "2a52",
+      "title": "wef",
+      "type": "project",
+      "completed": false
+    },
+    {
+      "id": "2178",
+      "title": "esf",
+      "type": "fitness",
+      "completed": false
+    },
+    {
+      "id": "f0c2",
+      "title": "werv",
+      "type": "project",
+      "completed": false
+    }
+  ]
+}

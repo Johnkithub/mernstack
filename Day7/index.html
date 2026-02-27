@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Naveen | Goals 2026</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <video autoplay muted loop id="bg-video">
+    <source src="abi-toads-lazy-river.3840x2160.mp4" type="video/mp4">
+  </video>
+
+  <div class="today-date" id="todayDate"></div>
+
+  <section class="container">
+
+    <h1 class="main-title">My Vision 2026</h1>
+
+    <div id="goalsContent" class="hidden">
+
+      <!-- Career -->
+      <div class="glass-card">
+        <h2>Career Goal</h2>
+        <p>Become a Game Developer & Animator and build my own Game Dev Community.</p>
+      </div>
+
+      <!-- Books + Projects -->
+      <div class="dual-section">
+
+        <div class="glass-card">
+          <div class="card-header">
+            <h2>Books To Complete</h2>
+            <span class="edit-toggle">Edit</span>
+          </div>
+          <ul id="booksList"></ul>
+        </div>
+
+        <div class="glass-card">
+          <div class="card-header">
+            <h2>Major Projects</h2>
+            <span class="edit-toggle">Edit</span>
+          </div>
+          <ul id="projectsList"></ul>
+        </div>
+
+      </div>
+
+      <!-- Skills -->
+      <div class="glass-card" id="skillsCard">
+        <h2>Skills Development</h2>
+        <p><strong>Current Strengths:</strong> Book Reading, Communication</p>
+        <p><strong>Improving:</strong> Art Skills, Storyboarding, Game Development</p>
+        <p><strong>Core Game Dev Concepts:</strong> Composition, Game Art, Storyboarding</p>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal hidden" id="goalModal">
+        <div class="modal-content">
+          <h2>Add New Goal</h2>
+
+          <input type="text" id="newTitle" placeholder="Goal Title" />
+
+          <div class="custom-select" id="customSelect">
+            <div class="select-selected">Select Category</div>
+            <div class="select-options hidden">
+              <div data-value="book">Book</div>
+              <div data-value="project">Project</div>
+              <div data-value="fitness">Fitness</div>
+              <div data-value="learning">Learning</div>
+            </div>
+          </div>
+
+          <button type="button" id="saveGoal">Save Goal</button>
+        </div>
+      </div>
+
+      <div class="floating-add" id="addGoalBtn">+</div>
+
+    </div>
+
+    <div class="button-section">
+      <button class="play-btn">Start Journey</button>
+    </div>
+
+  </section>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
