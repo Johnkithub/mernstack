@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✦ Realm Details ✦</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .realm-detail {
+            min-height: 100vh;
+            padding: 100px 20px;
+            position: relative;
+        }
+        
+        .realm-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .realm-icon {
+            font-size: 8rem;
+            margin-bottom: 20px;
+        }
+        
+        .realm-name {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .realm-long-desc {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+            color: #ccc;
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 100px;
+            left: 50px;
+            background: transparent;
+            border: 2px solid gold;
+            color: gold;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            text-decoration: none;
+        }
+        
+        .back-button:hover {
+            background: gold;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">← BACK TO REALMS</a>
+    
+    <div class="realm-detail" id="realmDetail">
+        <!-- Content loaded dynamically -->
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+        
+        async function loadRealmDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const realmId = urlParams.get('id');
+            
+            try {
+                const response = await fetch(`${API_URL}/realms/${realmId}`);
+                const realm = await response.json();
+                
+                document.body.style.background = `radial-gradient(circle at center, ${realm.color}22, #030614)`;
+                
+                document.getElementById('realmDetail').innerHTML = `
+                    <div class="realm-header">
+                        <div class="realm-icon">${realm.symbol}</div>
+                        <h1 class="realm-name" style="color: ${realm.color}">${realm.name}</h1>
+                        <p class="realm-long-desc">${realm.longDescription || realm.description}</p>
+                    </div>
+                    
+                    <div class="realm-stats" style="justify-content: center; gap: 50px;">
+                        <div class="realm-stat">
+                            <div class="stat-label">POWER</div>
+                            <div class="stat-number">${realm.powerLevel}%</div>
+                        </div>
+                        <div class="realm-stat">
+                            <div class="stat-label">MAGIC</div>
+                            <div class="stat-number">${realm.magicLevel}%</div>
+                        </div>
+                        <div class="realm-stat">
+                            <div class="stat-label">WISDOM</div>
+                            <div class="stat-number">${realm.wisdomLevel}%</div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 50px;">
+                        <h3 style="color: gold; margin-bottom: 20px;">✦ REALM FEATURES ✦</h3>
+                        <div class="realm-features" style="justify-content: center;">
+                            ${realm.features.map(f => `<span class="feature-tag">✦ ${f}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading realm details:', error);
+            }
+        }
+        
+        loadRealmDetails();
+    </script>
+</body>
+</html>

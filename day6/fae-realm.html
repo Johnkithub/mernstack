@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✦ SYLVAN VEIL ✦ | Whispering Woods - A Fae Journey</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=MedievalSharp&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ========== RESET & GLOBAL ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Cinzel', serif;
+            overflow: hidden;
+            background: #0a0515;
+        }
+
+        /* ========== PREMIUM LOADING SCREEN ========== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0515;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease;
+            pointer-events: none;
+        }
+
+        .loading-screen.fade-out {
+            opacity: 0;
+        }
+
+        .loading-icon {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 0 50px #f472b6);
+            animation: loadingFloat 2s infinite alternate;
+        }
+
+        @keyframes loadingFloat {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-20px) scale(1.1); }
+        }
+
+        .loading-bar-container {
+            width: 400px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
+        .loading-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #f472b6, #c084fc, #f0abfc);
+            animation: loadingProgress 2s ease-in-out forwards;
+            box-shadow: 0 0 30px #f472b6;
+        }
+
+        @keyframes loadingProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .loading-text {
+            color: #fbcfe8;
+            font-size: 1.2rem;
+            letter-spacing: 8px;
+            text-shadow: 0 0 20px #f472b6;
+        }
+
+        /* ========== GAME CANVAS ========== */
+        #gameCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: block;
+            z-index: 1;
+            cursor: none;
+        }
+
+        /* ========== PREMIUM CURSOR ========== */
+        .game-cursor {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f472b6;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1000;
+            transition: width 0.2s, height 0.2s, background 0.2s;
+            box-shadow: 0 0 30px #f472b6;
+            backdrop-filter: blur(2px);
+        }
+
+        .game-cursor::before {
+            content: '✨';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: #f472b6;
+            filter: drop-shadow(0 0 20px #f472b6);
+            white-space: nowrap;
+        }
+
+        .game-cursor.interact {
+            width: 60px;
+            height: 60px;
+            border-color: gold;
+            box-shadow: 0 0 50px gold;
+        }
+
+        .game-cursor.interact::before {
+            content: '✨ COLLECT ✨';
+            color: gold;
+        }
+
+        /* ========== UI OVERLAY ========== */
+        .game-ui {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Premium Header */
+        .game-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to bottom, rgba(10,5,21,0.9), transparent);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(244,114,182,0.3);
+        }
+
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .title-icon {
+            font-size: 2rem;
+            filter: drop-shadow(0 0 30px #f472b6);
+            animation: titleFloat 3s infinite alternate;
+        }
+
+        @keyframes titleFloat {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-5px); }
+        }
+
+        .title-text {
+            font-size: 1.5rem;
+            color: #fbcfe8;
+            text-shadow: 0 0 20px #f472b6;
+            letter-spacing: 4px;
+        }
+
+        .game-time {
+            color: #c0b283;
+            font-size: 1rem;
+            padding: 8px 20px;
+            background: rgba(244,114,182,0.1);
+            border: 2px solid #f472b6;
+            border-radius: 30px;
+            box-shadow: 0 0 30px rgba(244,114,182,0.3);
+        }
+
+        /* Premium Compass */
+        .compass-container {
+            position: absolute;
+            top: 100px;
+            right: 40px;
+            text-align: center;
+        }
+
+        .compass-label {
+            color: #c0b283;
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        .compass {
+            width: 120px;
+            height: 120px;
+            background: rgba(26, 15, 42, 0.6);
+            backdrop-filter: blur(15px);
+            border: 3px solid #f472b6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 50px rgba(244,114,182,0.3);
+        }
+
+        .compass::before {
+            content: 'N';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: gold;
+            font-weight: bold;
+        }
+
+        .compass-needle {
+            width: 4px;
+            height: 50px;
+            background: linear-gradient(to top, #f472b6, gold);
+            border-radius: 2px;
+            transform-origin: bottom center;
+            position: relative;
+            top: -10px;
+            transition: transform 0.1s;
+        }
+
+        /* Premium Location Card */
+        .location-card {
+            position: absolute;
+            top: 100px;
+            left: 40px;
+            background: rgba(26, 15, 42, 0.7);
+            backdrop-filter: blur(15px);
+            border: 3px solid #f472b6;
+            border-radius: 30px;
+            padding: 25px;
+            max-width: 350px;
+            box-shadow: 0 0 60px rgba(244,114,182,0.3);
+            border-left: 8px solid #f472b6;
+        }
+
+        .location-name {
+            font-size: 2rem;
+            color: #fbcfe8;
+            margin-bottom: 5px;
+            text-shadow: 0 0 20px #f472b6;
+        }
+
+        .location-desc {
+            color: #c0b283;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .location-atmosphere {
+            display: flex;
+            gap: 10px;
+            color: #fbcfe8;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(244,114,182,0.3);
+            padding-top: 15px;
+        }
+
+        .atmo-icon {
+            color: gold;
+        }
+
+        /* Premium Inventory */
+        .inventory-panel {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            background: rgba(26, 15, 42, 0.7);
+            backdrop-filter: blur(15px);
+            border: 3px solid #f472b6;
+            border-radius: 40px;
+            padding: 20px 30px;
+            box-shadow: 0 0 60px rgba(244,114,182,0.3);
+        }
+
+        .inventory-title {
+            color: #fbcfe8;
+            font-size: 1rem;
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .inventory-grid {
+            display: flex;
+            gap: 15px;
+        }
+
+        .inventory-slot {
+            width: 70px;
+            height: 70px;
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #f472b6;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .inventory-slot.filled {
+            border-color: gold;
+            box-shadow: 0 0 30px gold;
+            background: rgba(244,114,182,0.1);
+        }
+
+        .inventory-slot .count {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: gold;
+            color: black;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 2px solid white;
+        }
+
+        /* Premium Controls Panel */
+        .controls-panel {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            background: rgba(26, 15, 42, 0.6);
+            backdrop-filter: blur(15px);
+            border: 2px solid #f472b6;
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 0 40px rgba(244,114,182,0.2);
+        }
+
+        .controls-title {
+            color: gold;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            text-align: center;
+            letter-spacing: 4px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fbcfe8;
+            font-size: 0.9rem;
+        }
+
+        .key {
+            background: rgba(0,0,0,0.5);
+            border: 2px solid gold;
+            border-radius: 8px;
+            padding: 5px 10px;
+            color: gold;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        /* Premium Minimap */
+        .minimap-container {
+            position: absolute;
+            top: 100px;
+            right: 200px;
+            text-align: center;
+        }
+
+        .minimap {
+            width: 150px;
+            height: 150px;
+            background: rgba(26, 15, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border: 3px solid #f472b6;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 0 40px rgba(244,114,182,0.3);
+        }
+
+        .minimap-grid {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+        }
+
+        .minimap-cell {
+            background: rgba(244, 114, 182, 0.2);
+            border: 1px solid #f472b6;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .minimap-cell.current {
+            background: gold;
+            box-shadow: 0 0 20px gold;
+            border-color: white;
+        }
+
+        .minimap-cell.discovered {
+            background: rgba(244, 114, 182, 0.6);
+        }
+
+        /* Premium Notifications */
+        .notification {
+            position: absolute;
+            top: 200px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(145deg, #f472b6, #c084fc);
+            color: black;
+            padding: 15px 40px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 0 60px gold;
+            border: 3px solid gold;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            white-space: nowrap;
+            animation: notificationSlide 0.5s;
+        }
+
+        @keyframes notificationSlide {
+            from { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        .notification-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Premium Whisper Box */
+        .whisper-box {
+            position: absolute;
+            bottom: 200px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(26, 15, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border: 3px solid #f472b6;
+            border-radius: 40px;
+            padding: 20px 40px;
+            color: #fbcfe8;
+            font-size: 1.2rem;
+            font-style: italic;
+            box-shadow: 0 0 60px rgba(244,114,182,0.5);
+            border-left: 8px solid gold;
+            animation: whisperAppear 0.5s;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        @keyframes whisperAppear {
+            from { opacity: 0; transform: translateX(-50%) scale(0.9); }
+            to { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+
+        .whisper-icon {
+            color: gold;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        /* Premium FPS Counter */
+        .fps-counter {
+            position: absolute;
+            top: 80px;
+            right: 40px;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8rem;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 8px;
+            border: 1px solid #f472b6;
+        }
+
+        /* Premium Particle Effects */
+        .particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .magic-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #f472b6;
+            border-radius: 50%;
+            filter: blur(2px);
+            animation: particleFloat 8s linear infinite;
+            box-shadow: 0 0 20px #f472b6;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Premium Return Button */
+        .return-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(244,114,182,0.2);
+            border: 2px solid #f472b6;
+            color: #fbcfe8;
+            padding: 10px 25px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .return-btn:hover {
+            background: #f472b6;
+            color: black;
+            transform: scale(1.05);
+            box-shadow: 0 0 40px #f472b6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .location-card { max-width: 280px; }
+            .location-name { font-size: 1.5rem; }
+        }
+
+        @media (max-width: 768px) {
+            .compass-container, .minimap-container { display: none; }
+            .controls-panel { display: none; }
+            .location-card { top: 80px; left: 20px; right: 20px; max-width: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Premium Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-icon">🦋</div>
+        <div class="loading-bar-container">
+            <div class="loading-bar"></div>
+        </div>
+        <div class="loading-text">ENTERING THE WHISPERING WOODS</div>
+    </div>
+
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Premium Cursor -->
+    <div class="game-cursor" id="gameCursor"></div>
+
+    <!-- Particle Container -->
+    <div class="particle-container" id="particleContainer"></div>
+
+    <!-- UI Overlay -->
+    <div class="game-ui">
+        <!-- Return Button -->
+        <a href="index.html" class="return-btn">
+            <span>←</span> RETURN TO REALMS
+        </a>
+
+        <!-- Game Header -->
+        <div class="game-header">
+            <div class="game-title">
+                <span class="title-icon">🦄</span>
+                <span class="title-text">SYLVAN VEIL</span>
+            </div>
+            <div class="game-time" id="gameTime">Day 1 • Twilight</div>
+        </div>
+
+        <!-- Location Card -->
+        <div class="location-card" id="locationCard">
+            <div class="location-name" id="locationName">Forest Edge</div>
+            <div class="location-desc" id="locationDesc">Where the forest meets the meadow. Ancient trees stand guard, their leaves whispering secrets of ages past.</div>
+            <div class="location-atmosphere">
+                <span class="atmo-icon">✨</span>
+                <span id="locationWeather">Gentle breeze, scattered starlight</span>
+            </div>
+        </div>
+
+        <!-- Compass -->
+        <div class="compass-container">
+            <div class="compass-label">DIRECTION</div>
+            <div class="compass">
+                <div class="compass-needle" id="compass"></div>
+            </div>
+        </div>
+
+        <!-- Minimap -->
+        <div class="minimap-container">
+            <div class="compass-label">FOREST MAP</div>
+            <div class="minimap">
+                <div class="minimap-grid" id="minimap"></div>
+            </div>
+        </div>
+
+        <!-- Inventory -->
+        <div class="inventory-panel">
+            <div class="inventory-title">MAGICAL INVENTORY</div>
+            <div class="inventory-grid" id="inventoryGrid">
+                <div class="inventory-slot" id="slot1"></div>
+                <div class="inventory-slot" id="slot2"></div>
+                <div class="inventory-slot" id="slot3"></div>
+                <div class="inventory-slot" id="slot4"></div>
+                <div class="inventory-slot" id="slot5"></div>
+            </div>
+        </div>
+
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <div class="controls-title">✦ CONTROLS ✦</div>
+            <div class="controls-grid">
+                <div class="control-item"><span class="key">W</span> Forward</div>
+                <div class="control-item"><span class="key">S</span> Backward</div>
+                <div class="control-item"><span class="key">A</span> Left</div>
+                <div class="control-item"><span class="key">D</span> Right</div>
+                <div class="control-item"><span class="key">E</span> Collect</div>
+                <div class="control-item"><span class="key">␣</span> Listen</div>
+            </div>
+        </div>
+
+        <!-- FPS Counter -->
+        <div class="fps-counter" id="fpsCounter">FPS: 60</div>
+
+        <!-- Dynamic Elements -->
+        <div id="notification" style="display: none;" class="notification"></div>
+        <div id="whisperBox" style="display: none;" class="whisper-box"></div>
+    </div>
+
+    <script>
+        // ========== PREMIUM CANVAS SETUP ==========
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const cursor = document.getElementById('gameCursor');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // ========== PREMIUM CURSOR ==========
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // ========== PREMIUM PARTICLE SYSTEM ==========
+        function createParticles() {
+            const container = document.getElementById('particleContainer');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'magic-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 8 + 5) + 's';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particle.style.background = ['#f472b6', '#c084fc', '#f0abfc'][Math.floor(Math.random() * 3)];
+                container.appendChild(particle);
+            }
+        }
+
+        // ========== PREMIUM GAME STATE ==========
+        const player = {
+            x: 100,
+            y: 100,
+            angle: 0,
+            speed: 3,
+            slowSpeed: 1.5,
+            radius: 20,
+            isWalking: false,
+            isRunning: false
+        };
+
+        // Forest World
+        const worldSize = 1000;
+        
+        // Premium Locations
+        const locations = [
+            { 
+                id: 0, 
+                name: 'Forest Edge', 
+                x: 100, y: 100, 
+                desc: 'Where the forest meets the meadow. Ancient trees stand guard, their leaves whispering secrets of ages past.',
+                atmosphere: 'Gentle breeze, scattered starlight',
+                discovered: true, 
+                icon: '🌳', 
+                color: '#f472b6' 
+            },
+            { 
+                id: 1, 
+                name: 'Whispering Glade', 
+                x: 300, y: 200, 
+                desc: 'A circular clearing where the wind speaks in riddles. Glowing mushrooms line the perimeter.',
+                atmosphere: 'Mystical whispers, floating spores',
+                discovered: false, 
+                icon: '🍃', 
+                color: '#c084fc' 
+            },
+            { 
+                id: 2, 
+                name: 'Starlight Pond', 
+                x: 500, y: 400, 
+                desc: 'Still water reflects stars that aren\'t there. Ripples form ancient symbols when touched.',
+                atmosphere: 'Crystalline calm, star reflections',
+                discovered: false, 
+                icon: '✨', 
+                color: '#f0abfc' 
+            },
+            { 
+                id: 3, 
+                name: 'Moonpetal Grove', 
+                x: 200, y: 600, 
+                desc: 'Flowers that bloom only in moonlight. Their petals glow softly, illuminating the darkness.',
+                atmosphere: 'Moonlit glow, night blossoms',
+                discovered: false, 
+                icon: '🌸', 
+                color: '#f9a8d4' 
+            },
+            { 
+                id: 4, 
+                name: 'Crystal Cave', 
+                x: 700, y: 300, 
+                desc: 'Crystals echo with ancient songs. Each crystal holds a memory of the Fae.',
+                atmosphere: 'Resonant hum, crystal light',
+                discovered: false, 
+                icon: '💎', 
+                color: '#a78bfa' 
+            },
+            { 
+                id: 5, 
+                name: 'Fae Circle', 
+                x: 600, y: 700, 
+                desc: 'Mushrooms form a perfect circle. The Fae gather here on solstices to dance.',
+                atmosphere: 'Sparkling energy, fairy dust',
+                discovered: false, 
+                icon: '🍄', 
+                color: '#d8b4fe' 
+            },
+            { 
+                id: 6, 
+                name: 'Ancient Oak', 
+                x: 400, y: 500, 
+                desc: 'The oldest tree in the forest. Its bark tells stories in ancient runes.',
+                atmosphere: 'Ancient presence, wisdom',
+                discovered: false, 
+                icon: '🌲', 
+                color: '#6b7280' 
+            },
+            { 
+                id: 7, 
+                name: 'Eternal Spring', 
+                x: 800, y: 200, 
+                desc: 'Water that never stops flowing. It\'s said to hold memories of the past.',
+                atmosphere: 'Timeless flow, memory water',
+                discovered: false, 
+                icon: '💧', 
+                color: '#60a5fa' 
+            },
+            { 
+                id: 8, 
+                name: 'Heart of the Woods', 
+                x: 500, y: 500, 
+                desc: 'The most sacred place. The Celestial Stag once danced here, leaving magic in the soil.',
+                atmosphere: 'Sacred silence, ancient power',
+                discovered: false, 
+                icon: '🌟', 
+                color: 'gold' 
+            }
+        ];
+
+        // Premium Items
+        const items = [
+            { id: 0, x: 150, y: 150, type: 'Memory Shard', collected: false, icon: '🔮', desc: 'A fragment of forgotten times' },
+            { id: 1, x: 350, y: 250, type: 'Fae Dust', collected: false, icon: '✨', desc: 'Glittering powder of the fae' },
+            { id: 2, x: 550, y: 450, type: 'Moon Petal', collected: false, icon: '🌸', desc: 'Blooms only under moonlight' },
+            { id: 3, x: 250, y: 650, type: 'Crystal Shard', collected: false, icon: '💎', desc: 'Echoes with ancient songs' },
+            { id: 4, x: 750, y: 350, type: 'Starlight Tear', collected: false, icon: '💧', desc: 'A tear from a fallen star' },
+            { id: 5, x: 650, y: 750, type: 'Magic Spore', collected: false, icon: '🍄', desc: 'Glowing mushroom spore' },
+            { id: 6, x: 450, y: 550, type: 'Oak Heart', collected: false, icon: '🌰', desc: 'The essence of the ancient oak' },
+            { id: 7, x: 850, y: 250, type: 'Time Drop', collected: false, icon: '⏳', desc: 'A moment frozen in time' }
+        ];
+
+        // Premium Obstacles (Trees)
+        const obstacles = [];
+        for (let i = 0; i < 80; i++) {
+            obstacles.push({
+                x: 100 + Math.random() * 800,
+                y: 100 + Math.random() * 800,
+                size: 20 + Math.random() * 30,
+                type: ['oak', 'willow', 'pine'][Math.floor(Math.random() * 3)]
+            });
+        }
+
+        // Game State
+        let inventory = [];
+        let currentLocation = locations[0];
+        let dayCount = 1;
+        let timeOfDay = 'Twilight';
+        let collectedCount = 0;
+        let gameTime = 0;
+
+        // ========== PREMIUM KEYBOARD CONTROLS ==========
+        const keys = {
+            w: false, a: false, s: false, d: false,
+            shift: false, e: false, space: false
+        };
+
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            
+            if (['w', 'a', 's', 'd', 'shift', 'e', ' '].includes(key)) {
+                e.preventDefault();
+            }
+            
+            switch(key) {
+                case 'w': keys.w = true; player.isWalking = true; break;
+                case 'a': keys.a = true; player.isWalking = true; break;
+                case 's': keys.s = true; player.isWalking = true; break;
+                case 'd': keys.d = true; player.isWalking = true; break;
+                case 'shift': keys.shift = true; player.isRunning = true; break;
+                case 'e': 
+                    keys.e = true; 
+                    interact();
+                    break;
+                case ' ': 
+                    keys.space = true; 
+                    listenToWhispers();
+                    break;
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            
+            switch(key) {
+                case 'w': keys.w = false; break;
+                case 'a': keys.a = false; break;
+                case 's': keys.s = false; break;
+                case 'd': keys.d = false; break;
+                case 'shift': keys.shift = false; player.isRunning = false; break;
+                case 'e': keys.e = false; break;
+                case ' ': keys.space = false; break;
+            }
+            
+            if (!keys.w && !keys.a && !keys.s && !keys.d) {
+                player.isWalking = false;
+            }
+        });
+
+        // ========== PREMIUM MOVEMENT ==========
+        function updateMovement() {
+            const speed = keys.shift ? player.slowSpeed : player.speed;
+            let dx = 0, dy = 0;
+
+            if (keys.w) { dy -= speed; }
+            if (keys.s) { dy += speed; }
+            if (keys.a) { dx -= speed; }
+            if (keys.d) { dx += speed; }
+
+            if (dx !== 0 || dy !== 0) {
+                player.angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            }
+
+            let newX = player.x + dx;
+            let newY = player.y + dy;
+
+            // World bounds
+            if (newX > 30 && newX < worldSize - 30) player.x = newX;
+            if (newY > 30 && newY < worldSize - 30) player.y = newY;
+
+            // Collision with trees
+            for (let obs of obstacles) {
+                const dist = Math.hypot(player.x - obs.x, player.y - obs.y);
+                if (dist < obs.size + player.radius) {
+                    if (dx !== 0) player.x -= dx;
+                    if (dy !== 0) player.y -= dy;
+                    break;
+                }
+            }
+
+            // Update game time
+            gameTime++;
+            if (gameTime % 1000 === 0) {
+                advanceTime();
+            }
+
+            checkLocationDiscovery();
+            updateCursor();
+        }
+
+        // ========== PREMIUM LOCATION DISCOVERY ==========
+        function checkLocationDiscovery() {
+            for (let loc of locations) {
+                if (!loc.discovered) {
+                    const dist = Math.hypot(player.x - loc.x, player.y - loc.y);
+                    if (dist < 70) {
+                        loc.discovered = true;
+                        currentLocation = loc;
+                        showNotification('✨', `Discovered: ${loc.name}`);
+                        updateLocationInfo();
+                        updateMinimap();
+                        
+                        // Celebration particles
+                        for (let i = 0; i < 10; i++) {
+                            setTimeout(() => createCelebrationParticle(loc.x, loc.y), i * 100);
+                        }
+                    }
+                }
+            }
+        }
+
+        // ========== PREMIUM INTERACTION ==========
+        function interact() {
+            for (let item of items) {
+                if (!item.collected) {
+                    const dist = Math.hypot(player.x - item.x, player.y - item.y);
+                    if (dist < 60) {
+                        item.collected = true;
+                        inventory.push(item.type);
+                        collectedCount++;
+                        showNotification(item.icon, `Found: ${item.type} - ${item.desc}`);
+                        updateInventory();
+                        updateCursor();
+                        
+                        // Check if all items collected
+                        if (collectedCount === items.length) {
+                            showNotification('🌟', 'All memories collected! The truth awaits at the Heart of the Woods!');
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+
+        // ========== PREMIUM WHISPERS ==========
+        function listenToWhispers() {
+            const whispers = [
+                { icon: '🍃', text: "Follow the moonlight to hidden groves... The moonpetals bloom at night." },
+                { icon: '✨', text: "The oldest tree remembers your name. Seek the Ancient Oak." },
+                { icon: '💎', text: "Crystals echo with forgotten songs. The cave holds many secrets." },
+                { icon: '💧', text: "Water holds memories of the past. Find the Eternal Spring." },
+                { icon: '🍄', text: "Mushrooms mark the Fae's path. The circle calls to you." },
+                { icon: '🌟', text: "The Stag danced where stars touch earth. The Heart awaits the worthy." }
+            ];
+            
+            const whisper = whispers[Math.floor(Math.random() * whispers.length)];
+            showWhisper(whisper.icon, whisper.text);
+        }
+
+        // ========== PREMIUM UI UPDATES ==========
+        function updateLocationInfo() {
+            document.getElementById('locationName').textContent = currentLocation.name;
+            document.getElementById('locationDesc').textContent = currentLocation.desc;
+            document.getElementById('locationWeather').textContent = currentLocation.atmosphere;
+        }
+
+        function updateInventory() {
+            const slots = ['slot1', 'slot2', 'slot3', 'slot4', 'slot5'];
+            slots.forEach((slotId, index) => {
+                const slot = document.getElementById(slotId);
+                if (index < inventory.length) {
+                    const itemType = inventory[index];
+                    const item = items.find(i => i.type === itemType);
+                    slot.innerHTML = item ? item.icon : '📦';
+                    slot.className = 'inventory-slot filled';
+                    
+                    // Add count if multiple
+                    const count = inventory.filter(i => i === itemType).length;
+                    if (count > 1) {
+                        const countSpan = document.createElement('span');
+                        countSpan.className = 'count';
+                        countSpan.textContent = count;
+                        slot.appendChild(countSpan);
+                    }
+                } else {
+                    slot.innerHTML = '';
+                    slot.className = 'inventory-slot';
+                }
+            });
+        }
+
+        function updateMinimap() {
+            const minimap = document.getElementById('minimap');
+            minimap.innerHTML = '';
+
+            const cellSize = worldSize / 3;
+            
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'minimap-cell';
+                
+                const cellX = (i % 3) * cellSize;
+                const cellY = Math.floor(i / 3) * cellSize;
+                
+                if (player.x >= cellX && player.x < cellX + cellSize &&
+                    player.y >= cellY && player.y < cellY + cellSize) {
+                    cell.classList.add('current');
+                }
+                
+                for (let loc of locations) {
+                    if (loc.discovered && 
+                        loc.x >= cellX && loc.x < cellX + cellSize &&
+                        loc.y >= cellY && loc.y < cellY + cellSize) {
+                        cell.classList.add('discovered');
+                        break;
+                    }
+                }
+                
+                minimap.appendChild(cell);
+            }
+        }
+
+        function updateCursor() {
+            let nearItem = false;
+            for (let item of items) {
+                if (!item.collected) {
+                    const dist = Math.hypot(player.x - item.x, player.y - item.y);
+                    if (dist < 80) {
+                        nearItem = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (nearItem) {
+                cursor.classList.add('interact');
+            } else {
+                cursor.classList.remove('interact');
+            }
+        }
+
+        function advanceTime() {
+            const times = ['Dawn', 'Morning', 'Afternoon', 'Twilight', 'Night'];
+            const currentIndex = times.indexOf(timeOfDay);
+            
+            if (currentIndex < times.length - 1) {
+                timeOfDay = times[currentIndex + 1];
+            } else {
+                timeOfDay = 'Dawn';
+                dayCount++;
+            }
+            
+            document.getElementById('gameTime').textContent = `Day ${dayCount} • ${timeOfDay}`;
+        }
+
+        function showNotification(icon, message) {
+            const notification = document.getElementById('notification');
+            notification.innerHTML = `<span class="notification-icon">${icon}</span>${message}`;
+            notification.style.display = 'flex';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        function showWhisper(icon, message) {
+            const whisperBox = document.getElementById('whisperBox');
+            whisperBox.innerHTML = `<span class="whisper-icon">${icon}</span>${message}`;
+            whisperBox.style.display = 'flex';
+            
+            setTimeout(() => {
+                whisperBox.style.display = 'none';
+            }, 5000);
+        }
+
+        function createCelebrationParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.className = 'magic-particle';
+            particle.style.left = (x / worldSize * 100) + '%';
+            particle.style.top = (y / worldSize * 100) + '%';
+            particle.style.background = 'gold';
+            particle.style.width = '15px';
+            particle.style.height = '15px';
+            particle.style.animationDuration = '1s';
+            document.getElementById('particleContainer').appendChild(particle);
+            
+            setTimeout(() => particle.remove(), 1000);
+        }
+
+        // ========== PREMIUM RENDERING ==========
+        function drawWorld() {
+            // Clear with gradient
+            const gradient = ctx.createRadialGradient(
+                canvas.width/2, canvas.height/2, 0,
+                canvas.width/2, canvas.height/2, canvas.width
+            );
+            gradient.addColorStop(0, '#2a1a3a');
+            gradient.addColorStop(0.5, '#1a0f2a');
+            gradient.addColorStop(1, '#0a0515');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const offsetX = canvas.width/2 - player.x;
+            const offsetY = canvas.height/2 - player.y;
+
+            // Draw ground texture
+            ctx.fillStyle = '#2a1a3a';
+            for (let i = 0; i < 50; i++) {
+                ctx.fillStyle = `rgba(68, 58, 68, ${Math.random() * 0.1})`;
+                ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 5, 5);
+            }
+
+            // Draw trees with premium styling
+            for (let obs of obstacles) {
+                const screenX = obs.x + offsetX;
+                const screenY = obs.y + offsetY;
+                const dist = Math.hypot(obs.x - player.x, obs.y - player.y);
+                
+                if (dist < 400) {
+                    const alpha = Math.max(0.2, 1 - dist / 400);
+                    
+                    // Tree shadow
+                    ctx.shadowColor = '#000';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowOffsetY = 5;
+                    
+                    // Tree trunk
+                    ctx.fillStyle = `rgba(74, 58, 74, ${alpha})`;
+                    ctx.fillRect(screenX - 8, screenY - 15, 16, 30);
+                    
+                    // Tree top
+                    ctx.shadowColor = '#f472b6';
+                    ctx.shadowBlur = 30;
+                    ctx.fillStyle = `rgba(144, 108, 144, ${alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(screenX, screenY - 25, obs.size/1.5, 0, Math.PI*2);
+                    ctx.fill();
+                    
+                    // Leaves glow
+                    ctx.shadowColor = '#f472b6';
+                    ctx.shadowBlur = 40;
+                    ctx.fillStyle = `rgba(244, 114, 182, ${alpha * 0.2})`;
+                    ctx.beginPath();
+                    ctx.arc(screenX, screenY - 25, obs.size/1.2, 0, Math.PI*2);
+                    ctx.fill();
+                }
+            }
+
+            // Draw items with premium glow
+            for (let item of items) {
+                if (!item.collected) {
+                    const screenX = item.x + offsetX;
+                    const screenY = item.y + offsetY;
+                    const dist = Math.hypot(item.x - player.x, item.y - player.y);
+                    
+                    if (dist < 300) {
+                        const alpha = Math.max(0.3, 1 - dist / 300);
+                        
+                        // Item glow
+                        ctx.shadowColor = '#f472b6';
+                        ctx.shadowBlur = 50;
+                        ctx.font = '40px Arial';
+                        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                        ctx.fillText(item.icon, screenX - 20, screenY - 20);
+                        
+                        // Extra glow for nearby items
+                        if (dist < 100) {
+                            ctx.shadowBlur = 80;
+                            ctx.shadowColor = 'gold';
+                            ctx.fillStyle = `rgba(255, 215, 0, ${alpha * 0.5})`;
+                            ctx.fillText(item.icon, screenX - 20, screenY - 20);
+                        }
+                    }
+                }
+            }
+
+            // Draw locations with premium markers
+            for (let loc of locations) {
+                if (loc.discovered) {
+                    const screenX = loc.x + offsetX;
+                    const screenY = loc.y + offsetY;
+                    const dist = Math.hypot(loc.x - player.x, loc.y - player.y);
+                    
+                    if (dist < 400) {
+                        const alpha = Math.max(0.3, 1 - dist / 400);
+                        
+                        // Location marker
+                        ctx.shadowColor = loc.color;
+                        ctx.shadowBlur = 40;
+                        ctx.font = '50px Arial';
+                        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                        ctx.fillText(loc.icon, screenX - 25, screenY - 25);
+                        
+                        // Location name if close
+                        if (dist < 150) {
+                            ctx.shadowBlur = 20;
+                            ctx.font = 'bold 16px Cinzel';
+                            ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`;
+                            ctx.fillText(loc.name, screenX - 50, screenY - 60);
+                        }
+                    }
+                }
+            }
+
+            // Draw PLAYER (Premium Fae Spirit)
+            const playerScreenX = canvas.width/2;
+            const playerScreenY = canvas.height/2;
+            
+            // Player glow
+            ctx.shadowBlur = 60;
+            ctx.shadowColor = player.isRunning ? 'gold' : '#f472b6';
+            
+            // Outer aura
+            ctx.fillStyle = player.isRunning ? 'rgba(255, 215, 0, 0.2)' : 'rgba(244, 114, 182, 0.2)';
+            ctx.beginPath();
+            ctx.arc(playerScreenX, playerScreenY, player.radius + 15, 0, Math.PI*2);
+            ctx.fill();
+            
+            // Inner aura
+            ctx.shadowBlur = 50;
+            ctx.fillStyle = player.isRunning ? 'rgba(255, 215, 0, 0.3)' : 'rgba(244, 114, 182, 0.3)';
+            ctx.beginPath();
+            ctx.arc(playerScreenX, playerScreenY, player.radius + 8, 0, Math.PI*2);
+            ctx.fill();
+            
+            // Player body
+            ctx.shadowBlur = 40;
+            ctx.fillStyle = '#fbcfe8';
+            ctx.beginPath();
+            ctx.arc(playerScreenX, playerScreenY, player.radius, 0, Math.PI*2);
+            ctx.fill();
+            
+            // Player symbols
+            ctx.shadowBlur = 30;
+            ctx.font = '25px Arial';
+            ctx.fillStyle = 'white';
+            ctx.fillText('✨', playerScreenX - 13, playerScreenY - 18);
+            ctx.fillText('🦋', playerScreenX - 13, playerScreenY + 10);
+            
+            // Direction indicator
+            if (player.isWalking) {
+                const dirX = playerScreenX + Math.cos(player.angle * Math.PI/180) * 50;
+                const dirY = playerScreenY + Math.sin(player.angle * Math.PI/180) * 50;
+                
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = 'gold';
+                ctx.strokeStyle = 'gold';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(playerScreenX, playerScreenY);
+                ctx.lineTo(dirX, dirY);
+                ctx.stroke();
+                
+                // Trail particles
+                for (let i = 0; i < 3; i++) {
+                    ctx.fillStyle = `rgba(255, 215, 0, ${Math.random() * 0.5})`;
+                    ctx.beginPath();
+                    ctx.arc(playerScreenX - (i * 10), playerScreenY - (i * 5), 3, 0, Math.PI*2);
+                    ctx.fill();
+                }
+            }
+
+            // Draw fog of war
+            ctx.shadowBlur = 0;
+            const fogGradient = ctx.createRadialGradient(
+                playerScreenX, playerScreenY, 0,
+                playerScreenX, playerScreenY, canvas.width/1.2
+            );
+            fogGradient.addColorStop(0, 'rgba(10, 5, 21, 0)');
+            fogGradient.addColorStop(0.7, 'rgba(10, 5, 21, 0.5)');
+            fogGradient.addColorStop(1, 'rgba(10, 5, 21, 0.9)');
+            ctx.fillStyle = fogGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // ========== PREMIUM GAME LOOP ==========
+        let frameCount = 0;
+        let lastFpsUpdate = 0;
+
+        function gameLoop(currentTime) {
+            // FPS calculation
+            frameCount++;
+            if (currentTime - lastFpsUpdate >= 1000) {
+                document.getElementById('fpsCounter').textContent = `FPS: ${frameCount}`;
+                frameCount = 0;
+                lastFpsUpdate = currentTime;
+            }
+
+            updateMovement();
+            document.getElementById('compass').style.transform = `rotate(${player.angle}deg)`;
+            drawWorld();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ========== PREMIUM INITIALIZATION ==========
+        function init() {
+            player.x = locations[0].x;
+            player.y = locations[0].y;
+            
+            createParticles();
+            updateLocationInfo();
+            updateInventory();
+            updateMinimap();
+            
+            // Hide loading screen after 2 seconds
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.add('fade-out');
+            }, 2000);
+            
+            gameLoop();
+            
+            // Welcome message
+            setTimeout(() => {
+                showWhisper('🦋', 'Welcome to the Whispering Woods, fae spirit. Your journey begins...');
+            }, 2500);
+        }
+
+        init();
+    </script>
+</body>
+</html>

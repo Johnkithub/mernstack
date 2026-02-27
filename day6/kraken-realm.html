@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ SPARTAN'S WRATH - God of War Style</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Pixi.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.0/pixi.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: #0a0a0a;
+            overflow: hidden;
+            font-family: 'Cinzel', serif;
+        }
+
+        #gameCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a0a0a, #0a0a1a);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease;
+            color: #c0a060;
+        }
+
+        .loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-icon {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 0 50px #c0a060);
+            animation: loadingFloat 2s infinite alternate;
+        }
+
+        @keyframes loadingFloat {
+            from { transform: translateY(0) scale(1); }
+            to { transform: translateY(-20px) scale(1.1); }
+        }
+
+        .loading-bar-container {
+            width: 500px;
+            height: 4px;
+            background: rgba(192,160,96,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
+        .loading-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #c0a060, #ff4444, #c0a060);
+            animation: loadingProgress 2s ease-in-out forwards;
+            box-shadow: 0 0 30px #c0a060;
+        }
+
+        @keyframes loadingProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .loading-text {
+            color: #c0a060;
+            font-size: 1.5rem;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+        }
+
+        /* UI Overlay */
+        .game-ui {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Health Bar */
+        .health-container {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            width: 300px;
+        }
+
+        .health-label {
+            display: flex;
+            justify-content: space-between;
+            color: #c0a060;
+            margin-bottom: 5px;
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
+
+        .health-bar-bg {
+            width: 100%;
+            height: 25px;
+            background: rgba(0,0,0,0.7);
+            border: 3px solid #c0a060;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(192,160,96,0.3);
+        }
+
+        .health-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #ff4444, #ff8888);
+            transition: width 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .health-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: healthShine 2s infinite;
+        }
+
+        @keyframes healthShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Rage Meter */
+        .rage-container {
+            position: absolute;
+            top: 100px;
+            left: 30px;
+            width: 300px;
+        }
+
+        .rage-label {
+            display: flex;
+            justify-content: space-between;
+            color: #c0a060;
+            margin-bottom: 5px;
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
+
+        .rage-bar-bg {
+            width: 100%;
+            height: 15px;
+            background: rgba(0,0,0,0.7);
+            border: 2px solid #c0a060;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .rage-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff8800, #ffaa00);
+            transition: width 0.3s;
+            box-shadow: 0 0 20px #ffaa00;
+        }
+
+        /* Combo Counter */
+        .combo-container {
+            position: absolute;
+            top: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .combo-number {
+            font-size: 4rem;
+            color: #c0a060;
+            text-shadow: 0 0 30px #c0a060, 0 0 60px #ff4444;
+            animation: comboPulse 0.5s;
+        }
+
+        .combo-text {
+            color: #c0a060;
+            font-size: 1rem;
+            letter-spacing: 4px;
+        }
+
+        @keyframes comboPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(1); }
+        }
+
+        /* Kill Count */
+        .kill-container {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            text-align: right;
+        }
+
+        .kill-number {
+            font-size: 3rem;
+            color: #c0a060;
+            text-shadow: 0 0 30px #c0a060;
+            line-height: 1;
+        }
+
+        .kill-text {
+            color: #c0a060;
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
+
+        /* Controls Hint */
+        .controls-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid #c0a060;
+            border-radius: 40px;
+            padding: 15px 30px;
+            color: #c0a060;
+            font-size: 1rem;
+            display: flex;
+            gap: 30px;
+        }
+
+        .key {
+            background: rgba(0,0,0,0.7);
+            border: 2px solid #c0a060;
+            border-radius: 8px;
+            padding: 5px 15px;
+            color: #c0a060;
+            font-weight: bold;
+        }
+
+        /* Game Over Modal */
+        .gameover-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(145deg, #1a0a0a, #0a0a1a);
+            border: 6px solid #c0a060;
+            border-radius: 60px;
+            padding: 60px;
+            text-align: center;
+            z-index: 2000;
+            box-shadow: 0 0 200px #c0a060;
+            display: none;
+            min-width: 600px;
+        }
+
+        .gameover-modal.active {
+            display: block;
+            animation: modalReveal 0.8s;
+        }
+
+        @keyframes modalReveal {
+            from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .gameover-icon {
+            font-size: 6rem;
+            margin-bottom: 20px;
+            animation: gameoverPulse 2s infinite;
+        }
+
+        @keyframes gameoverPulse {
+            0%, 100% { filter: drop-shadow(0 0 30px #c0a060); }
+            50% { filter: drop-shadow(0 0 80px #c0a060) drop-shadow(0 0 120px #ff4444); }
+        }
+
+        .gameover-text {
+            font-size: 4rem;
+            color: #c0a060;
+            text-shadow: 0 0 50px #c0a060;
+            margin-bottom: 20px;
+        }
+
+        .gameover-stats {
+            color: #c0a060;
+            font-size: 1.5rem;
+            margin: 30px 0;
+            line-height: 2;
+        }
+
+        .retry-btn {
+            background: #c0a060;
+            color: black;
+            border: none;
+            padding: 20px 50px;
+            border-radius: 60px;
+            font-size: 1.5rem;
+            font-family: 'Cinzel', serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid white;
+            margin-top: 20px;
+        }
+
+        .retry-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 100px #c0a060;
+        }
+
+        /* FPS Counter */
+        .fps-counter {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            color: rgba(192,160,96,0.5);
+            font-size: 0.8rem;
+            background: rgba(0,0,0,0.3);
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #c0a060;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-icon">⚔️</div>
+        <div class="loading-bar-container">
+            <div class="loading-bar"></div>
+        </div>
+        <div class="loading-text">SPARTAN'S WRATH</div>
+    </div>
+
+    <!-- Game Canvas (Pixi will attach here) -->
+    <div id="gameCanvas"></div>
+
+    <!-- UI Overlay -->
+    <div class="game-ui">
+        <!-- Health Bar -->
+        <div class="health-container">
+            <div class="health-label">
+                <span>❤️ HEALTH</span>
+                <span id="healthValue">100/100</span>
+            </div>
+            <div class="health-bar-bg">
+                <div class="health-fill" id="healthBar" style="width: 100%"></div>
+            </div>
+        </div>
+
+        <!-- Rage Meter -->
+        <div class="rage-container">
+            <div class="rage-label">
+                <span>⚡ RAGE</span>
+                <span id="rageValue">0/100</span>
+            </div>
+            <div class="rage-bar-bg">
+                <div class="rage-fill" id="rageBar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Combo Counter -->
+        <div class="combo-container">
+            <div class="combo-number" id="comboNumber">0</div>
+            <div class="combo-text">HIT COMBO</div>
+        </div>
+
+        <!-- Kill Counter -->
+        <div class="kill-container">
+            <div class="kill-number" id="killCount">0</div>
+            <div class="kill-text">KILLS</div>
+        </div>
+
+        <!-- Controls Hint -->
+        <div class="controls-hint">
+            <div><span class="key">← →</span> MOVE</div>
+            <div><span class="key">CLICK</span> ATTACK</div>
+            <div><span class="key">SPACE</span> BLOCK</div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div class="gameover-modal" id="gameoverModal">
+            <div class="gameover-icon">⚔️</div>
+            <div class="gameover-text">GAME OVER</div>
+            <div class="gameover-stats" id="gameoverStats">
+                <div>Kills: <span id="finalKills">0</span></div>
+                <div>Max Combo: <span id="finalCombo">0</span></div>
+                <div>Time: <span id="finalTime">0s</span></div>
+            </div>
+            <button class="retry-btn" onclick="retry()">FIGHT AGAIN</button>
+        </div>
+
+        <!-- FPS Counter -->
+        <div class="fps-counter" id="fpsCounter">FPS: 60</div>
+    </div>
+
+    <script>
+        // Initialize Pixi Application
+        const app = new PIXI.Application({
+            width: window.innerWidth,
+            height: window.innerHeight,
+            backgroundColor: 0x0a0a0a,
+            resolution: window.devicePixelRatio || 1,
+            autoDensity: true
+        });
+
+        document.getElementById('gameCanvas').appendChild(app.view);
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            app.renderer.resize(window.innerWidth, window.innerHeight);
+        });
+
+        // ========== CREATE SPRITES (Drawing them programmatically) ==========
+        function createSprite(color, width, height, graphics) {
+            const sprite = new PIXI.Graphics();
+            sprite.beginFill(color);
+            sprite.drawRect(0, 0, width, height);
+            sprite.endFill();
+            return sprite;
+        }
+
+        // ========== PLAYER CLASS ==========
+        class Player {
+            constructor() {
+                this.container = new PIXI.Container();
+                
+                // Body
+                this.body = new PIXI.Graphics();
+                this.body.beginFill(0x8b4b4b);
+                this.body.drawRect(-20, -30, 40, 60);
+                this.body.endFill();
+                
+                // Head
+                this.head = new PIXI.Graphics();
+                this.head.beginFill(0xc0a060);
+                this.head.drawCircle(0, -45, 15);
+                this.head.endFill();
+                
+                // Helmet
+                this.helmet = new PIXI.Graphics();
+                this.helmet.beginFill(0x6b4b4b);
+                this.helmet.drawRect(-12, -55, 24, 10);
+                this.helmet.endFill();
+                
+                // Axe
+                this.axe = new PIXI.Graphics();
+                this.axe.beginFill(0x6b6b6b);
+                this.axe.drawRect(20, -25, 30, 10);
+                this.axe.endFill();
+                
+                // Axe head
+                this.axeHead = new PIXI.Graphics();
+                this.axeHead.beginFill(0xc0c0c0);
+                this.axeHead.drawRect(45, -35, 15, 30);
+                this.axeHead.endFill();
+                
+                // Shield
+                this.shield = new PIXI.Graphics();
+                this.shield.beginFill(0x8b6b4b);
+                this.shield.drawCircle(-25, -10, 20);
+                this.shield.endFill();
+                
+                // Add to container
+                this.container.addChild(this.body);
+                this.container.addChild(this.head);
+                this.container.addChild(this.helmet);
+                this.container.addChild(this.axe);
+                this.container.addChild(this.axeHead);
+                this.container.addChild(this.shield);
+                
+                this.container.x = 400;
+                this.container.y = 300;
+                this.container.scale.set(1.5);
+                
+                this.velocity = { x: 0, y: 0 };
+                this.speed = 5;
+                this.health = 100;
+                this.maxHealth = 100;
+                this.rage = 0;
+                this.maxRage = 100;
+                this.isAttacking = false;
+                this.isBlocking = false;
+                this.attackTimer = 0;
+                this.comboCount = 0;
+                this.comboTimer = 0;
+                this.kills = 0;
+                
+                app.stage.addChild(this.container);
+            }
+
+            update(delta) {
+                // Movement
+                if (keys.left) {
+                    this.container.x -= this.speed * delta;
+                    this.container.scale.x = -1.5;
+                }
+                if (keys.right) {
+                    this.container.x += this.speed * delta;
+                    this.container.scale.x = 1.5;
+                }
+                if (keys.up) {
+                    this.container.y -= this.speed * delta;
+                }
+                if (keys.down) {
+                    this.container.y += this.speed * delta;
+                }
+
+                // Keep in bounds
+                this.container.x = Math.max(100, Math.min(app.screen.width - 100, this.container.x));
+                this.container.y = Math.max(100, Math.min(app.screen.height - 100, this.container.y));
+
+                // Attack animation
+                if (this.isAttacking) {
+                    this.attackTimer -= delta;
+                    if (this.attackTimer <= 0) {
+                        this.isAttacking = false;
+                        this.axe.rotation = 0;
+                        this.axeHead.rotation = 0;
+                    } else {
+                        this.axe.rotation = Math.sin(Date.now() * 0.02) * 0.5;
+                        this.axeHead.rotation = Math.sin(Date.now() * 0.02) * 0.5;
+                    }
+                }
+
+                // Block animation
+                if (this.isBlocking) {
+                    this.shield.x = -30;
+                    this.shield.alpha = 0.8;
+                } else {
+                    this.shield.x = -25;
+                    this.shield.alpha = 1;
+                }
+
+                // Combo timer
+                if (this.comboTimer > 0) {
+                    this.comboTimer -= delta;
+                    if (this.comboTimer <= 0) {
+                        this.comboCount = 0;
+                        document.getElementById('comboNumber').textContent = '0';
+                    }
+                }
+
+                // Rage decay
+                if (this.rage > 0) {
+                    this.rage = Math.max(0, this.rage - 0.1 * delta);
+                    updateRageBar(this.rage);
+                }
+
+                // Screen shake effect on low health
+                if (this.health < 30) {
+                    app.stage.x = Math.sin(Date.now() * 0.1) * 5;
+                    app.stage.y = Math.cos(Date.now() * 0.1) * 5;
+                } else {
+                    app.stage.x = 0;
+                    app.stage.y = 0;
+                }
+            }
+
+            attack() {
+                if (this.isAttacking) return;
+                
+                this.isAttacking = true;
+                this.attackTimer = 10;
+                
+                // Combo system
+                this.comboCount++;
+                this.comboTimer = 30;
+                document.getElementById('comboNumber').textContent = this.comboCount;
+                
+                // Add rage
+                this.rage = Math.min(this.maxRage, this.rage + 10);
+                updateRageBar(this.rage);
+                
+                // Screen shake
+                app.stage.x = 10;
+                app.stage.y = 10;
+                setTimeout(() => {
+                    app.stage.x = 0;
+                    app.stage.y = 0;
+                }, 100);
+                
+                return true;
+            }
+
+            takeDamage(amount) {
+                if (this.isBlocking) {
+                    amount *= 0.3;
+                    // Block spark effect
+                    createBlockSpark(this.container.x, this.container.y - 20);
+                }
+                
+                this.health = Math.max(0, this.health - amount);
+                updateHealthBar(this.health, this.maxHealth);
+                
+                // Hit effect
+                this.container.alpha = 0.5;
+                setTimeout(() => {
+                    this.container.alpha = 1;
+                }, 200);
+                
+                // Add rage on hit
+                this.rage = Math.min(this.maxRage, this.rage + 5);
+                updateRageBar(this.rage);
+                
+                return this.health <= 0;
+            }
+        }
+
+        // ========== ENEMY CLASS ==========
+        class Enemy {
+            constructor(x, y) {
+                this.container = new PIXI.Container();
+                
+                // Body
+                this.body = new PIXI.Graphics();
+                this.body.beginFill(0x4a2a2a);
+                this.body.drawRect(-15, -25, 30, 50);
+                this.body.endFill();
+                
+                // Head
+                this.head = new PIXI.Graphics();
+                this.head.beginFill(0x6b4b4b);
+                this.head.drawCircle(0, -35, 12);
+                this.head.endFill();
+                
+                // Eyes (glowing)
+                this.eyes = new PIXI.Graphics();
+                this.eyes.beginFill(0xff4444);
+                this.eyes.drawCircle(-4, -38, 3);
+                this.eyes.drawCircle(4, -38, 3);
+                this.eyes.endFill();
+                
+                // Weapon
+                this.weapon = new PIXI.Graphics();
+                this.weapon.beginFill(0x6b6b6b);
+                this.weapon.drawRect(15, -20, 20, 5);
+                this.weapon.endFill();
+                
+                this.container.addChild(this.body);
+                this.container.addChild(this.head);
+                this.container.addChild(this.eyes);
+                this.container.addChild(this.weapon);
+                
+                this.container.x = x;
+                this.container.y = y;
+                
+                this.health = 50;
+                this.maxHealth = 50;
+                this.speed = 1.5;
+                this.isAttacking = false;
+                this.attackTimer = 0;
+                
+                app.stage.addChild(this.container);
+            }
+
+            update(delta, player) {
+                // Move toward player
+                const dx = player.container.x - this.container.x;
+                const dy = player.container.y - this.container.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist > 100) {
+                    this.container.x += (dx / dist) * this.speed * delta;
+                    this.container.y += (dy / dist) * this.speed * delta;
+                    
+                    // Face player
+                    if (dx > 0) this.container.scale.x = 1;
+                    else this.container.scale.x = -1;
+                } else {
+                    // Attack
+                    this.attackTimer -= delta;
+                    if (this.attackTimer <= 0) {
+                        this.attackTimer = 30;
+                        player.takeDamage(10);
+                        
+                        // Attack effect
+                        this.weapon.rotation = 0.5;
+                        setTimeout(() => {
+                            this.weapon.rotation = 0;
+                        }, 200);
+                    }
+                }
+                
+                // Glowing eyes effect
+                this.eyes.alpha = 0.5 + Math.sin(Date.now() * 0.01) * 0.5;
+            }
+
+            takeDamage(amount) {
+                this.health -= amount;
+                
+                // Hit effect
+                this.container.alpha = 0.5;
+                setTimeout(() => {
+                    this.container.alpha = 1;
+                }, 200);
+                
+                // Blood effect
+                createBloodEffect(this.container.x, this.container.y - 20);
+                
+                return this.health <= 0;
+            }
+        }
+
+        // ========== EFFECTS ==========
+        function createBloodEffect(x, y) {
+            const blood = new PIXI.Container();
+            
+            for (let i = 0; i < 10; i++) {
+                const drop = new PIXI.Graphics();
+                drop.beginFill(0x8b0000);
+                drop.drawCircle(0, 0, 2 + Math.random() * 3);
+                drop.endFill();
+                
+                drop.x = Math.random() * 20 - 10;
+                drop.y = Math.random() * 20 - 10;
+                drop.alpha = 0.8;
+                
+                blood.addChild(drop);
+            }
+            
+            blood.x = x;
+            blood.y = y;
+            app.stage.addChild(blood);
+            
+            // Fade out
+            let timer = 0;
+            const fadeInterval = setInterval(() => {
+                timer++;
+                blood.alpha -= 0.05;
+                if (timer > 20) {
+                    clearInterval(fadeInterval);
+                    app.stage.removeChild(blood);
+                }
+            }, 50);
+        }
+
+        function createBlockSpark(x, y) {
+            const spark = new PIXI.Graphics();
+            spark.beginFill(0xffaa00);
+            spark.drawCircle(0, 0, 10);
+            spark.endFill();
+            
+            spark.x = x;
+            spark.y = y;
+            app.stage.addChild(spark);
+            
+            setTimeout(() => {
+                app.stage.removeChild(spark);
+            }, 200);
+        }
+
+        function createGroundDust(x, y) {
+            const dust = new PIXI.Graphics();
+            dust.beginFill(0x6b6b6b);
+            dust.drawCircle(0, 0, 5);
+            dust.endFill();
+            
+            dust.x = x;
+            dust.y = y + 20;
+            dust.alpha = 0.3;
+            app.stage.addChild(dust);
+            
+            setTimeout(() => {
+                app.stage.removeChild(dust);
+            }, 300);
+        }
+
+        // ========== GAME STATE ==========
+        const player = new Player();
+        let enemies = [];
+        let gameActive = true;
+        let keys = { left: false, right: false, up: false, down: false, space: false };
+        let spawnTimer = 0;
+        let killCount = 0;
+        let startTime = Date.now();
+
+        // ========== UI FUNCTIONS ==========
+        function updateHealthBar(health, maxHealth) {
+            const percent = (health / maxHealth) * 100;
+            document.getElementById('healthBar').style.width = percent + '%';
+            document.getElementById('healthValue').textContent = `${Math.floor(health)}/${maxHealth}`;
+        }
+
+        function updateRageBar(rage) {
+            const percent = (rage / player.maxRage) * 100;
+            document.getElementById('rageBar').style.width = percent + '%';
+            document.getElementById('rageValue').textContent = `${Math.floor(rage)}/100`;
+        }
+
+        function updateKillCount() {
+            killCount++;
+            document.getElementById('killCount').textContent = killCount;
+        }
+
+        // ========== KEYBOARD CONTROLS ==========
+        window.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            
+            if (['arrowleft', 'arrowright', 'arrowup', 'arrowdown', ' '].includes(key)) {
+                e.preventDefault();
+            }
+            
+            if (key === 'arrowleft') keys.left = true;
+            if (key === 'arrowright') keys.right = true;
+            if (key === 'arrowup') keys.up = true;
+            if (key === 'arrowdown') keys.down = true;
+            if (key === ' ') {
+                keys.space = true;
+                player.isBlocking = true;
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            
+            if (key === 'arrowleft') keys.left = false;
+            if (key === 'arrowright') keys.right = false;
+            if (key === 'arrowup') keys.up = false;
+            if (key === 'arrowdown') keys.down = false;
+            if (key === ' ') {
+                keys.space = false;
+                player.isBlocking = false;
+            }
+        });
+
+        // Mouse click for attack
+        window.addEventListener('click', () => {
+            if (!gameActive) return;
+            
+            if (player.attack()) {
+                // Check hit on enemies
+                for (let i = enemies.length - 1; i >= 0; i--) {
+                    const enemy = enemies[i];
+                    const dist = Math.abs(enemy.container.x - player.container.x) + 
+                                Math.abs(enemy.container.y - player.container.y);
+                    
+                    if (dist < 150) {
+                        if (enemy.takeDamage(25)) {
+                            enemies.splice(i, 1);
+                            app.stage.removeChild(enemy.container);
+                            updateKillCount();
+                            
+                            // Slow motion on kill
+                            app.ticker.speed = 0.3;
+                            setTimeout(() => {
+                                app.ticker.speed = 1;
+                            }, 200);
+                        }
+                    }
+                }
+            }
+        });
+
+        // ========== GAME LOOP ==========
+        app.ticker.add((delta) => {
+            if (!gameActive) return;
+
+            // Update player
+            player.update(delta);
+
+            // Spawn enemies
+            spawnTimer += delta;
+            if (spawnTimer > 60 && enemies.length < 5) {
+                spawnTimer = 0;
+                
+                const x = Math.random() * app.screen.width;
+                const y = Math.random() * app.screen.height;
+                const enemy = new Enemy(x, y);
+                enemies.push(enemy);
+            }
+
+            // Update enemies
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const enemy = enemies[i];
+                enemy.update(delta, player);
+            }
+
+            // Ground dust effect when moving
+            if (keys.left || keys.right || keys.up || keys.down) {
+                if (Math.random() < 0.1) {
+                    createGroundDust(player.container.x, player.container.y);
+                }
+            }
+        });
+
+        // ========== GAME OVER ==========
+        function gameOver() {
+            gameActive = false;
+            
+            const survivalTime = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('finalKills').textContent = killCount;
+            document.getElementById('finalCombo').textContent = player.comboCount;
+            document.getElementById('finalTime').textContent = survivalTime + 's';
+            
+            document.getElementById('gameoverModal').classList.add('active');
+        }
+
+        window.retry = function() {
+            location.reload();
+        };
+
+        // Check for player death
+        setInterval(() => {
+            if (player.health <= 0 && gameActive) {
+                gameOver();
+            }
+        }, 100);
+
+        // ========== INIT ==========
+        setTimeout(() => {
+            document.getElementById('loadingScreen').classList.add('fade-out');
+        }, 2000);
+
+        // FPS Counter
+        let frameCount = 0;
+        let lastFpsUpdate = 0;
+        
+        setInterval(() => {
+            document.getElementById('fpsCounter').textContent = `FPS: ${frameCount}`;
+            frameCount = 0;
+        }, 1000);
+
+        app.ticker.add(() => {
+            frameCount++;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+{
+  "realms": [
+    {
+      "id": 1,
+      "name": "DRACONIS NEBULA",
+      "type": "dragon",
+      "description": "A realm of primordial fire where stars are born from dragon's breath",
+      "longDescription": "In the time before stars, when the void was cold and empty, the Great Wyrm Ignis breathed fire across the darkness. Where his flames touched, galaxies ignited. Where his scales fell, worlds were born.",
+      "color": "#ff6600",
+      "secondaryColor": "#ff3300",
+      "symbol": "🐉",
+      "powerLevel": 95,
+      "magicLevel": 80,
+      "wisdomLevel": 70,
+      "population": 1247,
+      "videoPoster": "assets/images/dragon-poster.jpg",
+      "features": [
+        "Fire Breathing",
+        "Star Forging",
+        "Scale Armor",
+        "Cosmic Flight"
+      ],
+      "status": "active"
+    },
+    {
+      "id": 2,
+      "name": "SYLVAN VEIL",
+      "type": "fae",
+      "description": "Where stardust becomes flowers and magic flows like cosmic rivers",
+      "longDescription": "The Celestial Stag danced across the cosmos, and where her hooves touched the void, flowers of starlight bloomed. Her horn, dipped in the light of a thousand suns, weaves reality itself.",
+      "color": "#f472b6",
+      "secondaryColor": "#c084fc",
+      "symbol": "🦄",
+      "powerLevel": 60,
+      "magicLevel": 100,
+      "wisdomLevel": 90,
+      "population": 892,
+      "videoPoster": "assets/images/fae-poster.jpg",
+      "features": [
+        "Dream Weaving",
+        "Starlight Magic",
+        "Nature's Blessing",
+        "Eternal Beauty"
+      ],
+      "status": "active"
+    },
+    {
+      "id": 3,
+      "name": "ABYSSAL TRENCH",
+      "type": "kraken",
+      "description": "In the darkness between stars, ancient leviathans swim through void-oceans",
+      "longDescription": "Sonar readings indicate consciousness at 3,847 meters. It dreams of surface ships, of stars reflected in water, of times before humans walked the earth. Each pulse of its ancient heart creates tidal forces across dimensions.",
+      "color": "#00ffff",
+      "secondaryColor": "#0066cc",
+      "symbol": "🐙",
+      "powerLevel": 100,
+      "magicLevel": 70,
+      "wisdomLevel": 85,
+      "population": 2341,
+      "videoPoster": "assets/images/kraken-poster.jpg",
+      "features": [
+        "Depth Pressure",
+        "Tentacle Mastery",
+        "Sonar Vision",
+        "Ancient Knowledge"
+      ],
+      "status": "active"
+    }
+  ],
+  "missions": [
+    {
+      "id": 1,
+      "realmId": 1,
+      "name": "Collect Ember Essence",
+      "description": "Gather 10 floating embers from the dragon's breath",
+      "reward": "Dragon Scale Fragment",
+      "difficulty": "Hard",
+      "status": "available"
+    },
+    {
+      "id": 2,
+      "realmId": 1,
+      "name": "Awaken the Ancient",
+      "description": "Touch the crystal to increase awakening",
+      "reward": "Ember Scale",
+      "difficulty": "Legendary",
+      "status": "available"
+    },
+    {
+      "id": 3,
+      "realmId": 2,
+      "name": "Find the Hidden Glade",
+      "description": "Discover the secret fairy ring",
+      "reward": "Starlight Blessing",
+      "difficulty": "Medium",
+      "status": "available"
+    }
+  ],
+  "scores": [
+    {
+      "id": 1,
+      "realmId": 1,
+      "player": "DragonMaster",
+      "score": 95,
+      "date": "2026-02-21"
+    },
+    {
+      "id": 2,
+      "realmId": 2,
+      "player": "FaeQueen",
+      "score": 88,
+      "date": "2026-02-21"
+    }
+  ]
+}
