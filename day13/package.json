@@ -1,0 +1,20 @@
+{
+  "name": "coding-ideas",
+  "version": "1.0.0",
+  "description": "Coding Ideas MERN Backend",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "author": "Rajesh",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mongoose": "^9.2.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
